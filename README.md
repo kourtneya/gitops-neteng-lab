@@ -2,4 +2,4 @@
 
 Local GitOps workflow for network configuration validation and CML deployment.
 
-Repository synchorinized through Git and GitHub
+Repository synchorinized through Git and GitHub 
