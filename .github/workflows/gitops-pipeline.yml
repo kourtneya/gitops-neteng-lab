@@ -57,14 +57,14 @@ jobs:
           url: '${{ env.CML_URL }}/api/v0/authenticate'
           method: 'POST'
           customHeaders: '{"Content-Type": "application/json"}'
-          data: '{"username":"${{ env.CML_USERNAME }}","password":"${{ env.CML_PASSWORD }}"}'
+          data: '{"username":"admin","password":"1234QWer"}'
       - name: Get node inventory from the existing lab
         id: node_inventory
         uses: fjogeleit/http-request-action@v1.16.5
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/nodes?data=true&exclude_configurations=true'
           method: 'GET'
-          bearerToken: '${{ steps.cml_auth.outputs.response }}'
+          bearerToken: ${{ steps.cml_auth.outputs.response }}
           responseFile: 'nodes.json'
       - name: Map router labels to node IDs
         id: node_map
