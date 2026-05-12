@@ -83,6 +83,20 @@ jobs:
           echo "r1_node_id=$R1_NODE_ID" >> "$GITHUB_OUTPUT"
           echo "r2_node_id=$R2_NODE_ID" >> "$GITHUB_OUTPUT"
           echo "r3_node_id=$R3_NODE_ID" >> "$GITHUB_OUTPUT"
+      - name: Stop existing CML lab
+        uses: fjogeleit/http-request-action@v1.16.5
+        with:
+          url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/stop'
+          method: 'PUT'
+          bearerToken: ${{ steps.cml_token.outputs.token }}
+          preventFailureOnNoResponse: 'true'
+      - name: Wipe existing CML lab
+        uses: fjogeleit/http-request-action@v1.16.5
+        with:
+          url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/wipe'
+          method: 'PUT'
+          bearerToken: ${{ steps.cml_token.outputs.token }}
+          preventFailureOnNoResponse: 'true'
       - name: Build R1 configuration payload
         id: r1_payload
         run: |
@@ -134,20 +148,6 @@ jobs:
           bearerToken: ${{ steps.cml_token.outputs.token }}
           customHeaders: '{"Content-Type": "application/json"}'
           data: ${{ steps.r3_payload.outputs.json }}
-      - name: Stop existing CML lab
-        uses: fjogeleit/http-request-action@v1.16.5
-        with:
-          url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/stop'
-          method: 'PUT'
-          bearerToken: ${{ steps.cml_token.outputs.token }}
-          preventFailureOnNoResponse: 'true'
-      - name: Wipe existing CML lab
-        uses: fjogeleit/http-request-action@v1.16.5
-        with:
-          url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/wipe'
-          method: 'PUT'
-          bearerToken: ${{ steps.cml_token.outputs.token }}
-          preventFailureOnNoResponse: 'true'
       - name: Start existing CML lab
         uses: fjogeleit/http-request-action@v1.16.5
         with:
