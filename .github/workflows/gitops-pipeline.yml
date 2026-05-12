@@ -58,18 +58,21 @@ jobs:
           method: 'POST'
           data: '{"username":"${{ env.CML_USERNAME }}","password":"${{ env.CML_PASSWORD }}"}'
           responseFile: 'test.txt'
-      - name: AUTH RESPONSE
+      - name: Normalize CML token
+        id: cml_token
         run: |
-          echo "The full response string is: ${{ steps.cml_auth.outputs.response }}"
-          echo "The status is: ${{ steps.cml_auth.outputs.status}}"
-          less 'test.txt'
+          TOKEN='${{ steps.cml_auth.outputs.response }}'
+          TOKEN="${TOKEN%\"}"
+          TOKEN="${TOKEN#\"}"
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
       - name: Get node inventory from the existing lab
         id: node_inventory
         uses: fjogeleit/http-request-action@v1.16.5
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/nodes?data=true&exclude_configurations=true'
           method: 'GET'
-          bearerToken: '${{ steps.cml_auth.outputs.response }}'
+          bearerToken: ${{ steps.cml_token.outputs.token }}
           responseFile: 'nodes.json'
       - name: Map router labels to node IDs
         id: node_map
