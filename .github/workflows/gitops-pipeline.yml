@@ -61,6 +61,7 @@ jobs:
       - name: AUTH RESPONSE
         run: |
           echo "The full response string is: ${{ steps.cml_auth.outputs.response }}"
+          echo "The status is: ${{ steps.cml_auth.outputs.status}}"
       - name: Get node inventory from the existing lab
         id: node_inventory
         uses: fjogeleit/http-request-action@v1.16.5
