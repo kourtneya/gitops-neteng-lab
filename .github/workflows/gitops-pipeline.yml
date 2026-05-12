@@ -57,7 +57,7 @@ jobs:
           url: '${{ env.CML_URL }}/api/v0/authenticate'
           method: 'POST'
           customHeaders: '{"Content-Type": "application/json"}'
-          data: '{"username":"${{ env.CML_USERNAME }}","password":"${{ env.CML_PASSWORD }}"}'
+          data: '{"username":"admin","password":"1234QWer"}'
       - name: Get node inventory from the existing lab
         id: node_inventory
         uses: fjogeleit/http-request-action@v1.16.5
