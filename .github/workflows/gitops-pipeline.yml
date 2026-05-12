@@ -77,12 +77,10 @@ jobs:
       - name: Map router labels to node IDs
         id: node_map
         run: |
-          R1_NODE_ID=$(jq -r '.[] | select(.label=="R1") | .id' nodes.json)
-          R2_NODE_ID=$(jq -r '.[] | select(.label=="R2") | .id' nodes.json)
-          R3_NODE_ID=$(jq -r '.[] | select(.label=="R3") | .id' nodes.json)
-          echo "r1_node_id=$R1_NODE_ID" >> "$GITHUB_OUTPUT"
-          echo "r2_node_id=$R2_NODE_ID" >> "$GITHUB_OUTPUT"
-          echo "r3_node_id=$R3_NODE_ID" >> "$GITHUB_OUTPUT"
+          for router in R1 R2 R3; do
+            node_id=$(jq -r --arg label "$router" '.[] | select(.label==$label) | .id' nodes.json)
+            echo "${router,,}_node_id=$node_id" >> "$GITHUB_OUTPUT"
+          done
       - name: Stop existing CML lab
         uses: fjogeleit/http-request-action@v1.16.5
         with:
@@ -100,12 +98,8 @@ jobs:
       - name: Build R1 configuration payload
         id: r1_payload
         run: |
-          JSON_PAYLOAD=$(jq -Rs '{configuration: .}' configs/router1.cfg)
-          {
-            echo 'json<<EOF'
-            echo "$JSON_PAYLOAD"
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+          json=$(jq -c -Rs '{configuration: .}' configs/router1.cfg)
+          echo "json=$json" >> "$GITHUB_OUTPUT"
       - name: Update R1 configuration
         uses: fjogeleit/http-request-action@v1.16.5
         with:
@@ -117,12 +111,8 @@ jobs:
       - name: Build R2 configuration payload
         id: r2_payload
         run: |
-          JSON_PAYLOAD=$(jq -Rs '{configuration: .}' configs/router2.cfg)
-          {
-            echo 'json<<EOF'
-            echo "$JSON_PAYLOAD"
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+          json=$(jq -c -Rs '{configuration: .}' configs/router2.cfg)
+          echo "json=$json" >> "$GITHUB_OUTPUT"
       - name: Update R2 configuration
         uses: fjogeleit/http-request-action@v1.16.5
         with:
@@ -134,12 +124,8 @@ jobs:
       - name: Build R3 configuration payload
         id: r3_payload
         run: |
-          JSON_PAYLOAD=$(jq -Rs '{configuration: .}' configs/router3.cfg)
-          {
-            echo 'json<<EOF'
-            echo "$JSON_PAYLOAD"
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+          json=$(jq -c -Rs '{configuration: .}' configs/router3.cfg)
+          echo "json=$json" >> "$GITHUB_OUTPUT"
       - name: Update R3 configuration
         uses: fjogeleit/http-request-action@v1.16.5
         with:
