@@ -56,8 +56,8 @@ jobs:
         with:
           url: '${{ env.CML_URL }}/api/v0/authenticate'
           method: 'POST'
+          customHeaders: '{"Content-Type": "application/json"}'
           data: '{"username":"${{ env.CML_USERNAME }}","password":"${{ env.CML_PASSWORD }}"}'
-          responseFile: 'test.txt'
       - name: Normalize CML token
         id: cml_token
         run: |
@@ -97,7 +97,7 @@ jobs:
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/nodes/${{ steps.node_map.outputs.r1_node_id }}'
           method: 'PATCH'
-          bearerToken: ${{ steps.cml_auth.outputs.response }}
+          bearerToken: ${{ steps.cml_token.outputs.token }}
           customHeaders: '{"Content-Type": "application/json"}'
           data: ${{ steps.r1_payload.outputs.json }}
       - name: Build R2 configuration payload
@@ -114,7 +114,7 @@ jobs:
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/nodes/${{ steps.node_map.outputs.r2_node_id }}'
           method: 'PATCH'
-          bearerToken: ${{ steps.cml_auth.outputs.response }}
+          bearerToken: ${{ steps.cml_token.outputs.token }}
           customHeaders: '{"Content-Type": "application/json"}'
           data: ${{ steps.r2_payload.outputs.json }}
       - name: Build R3 configuration payload
@@ -131,7 +131,7 @@ jobs:
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/nodes/${{ steps.node_map.outputs.r3_node_id }}'
           method: 'PATCH'
-          bearerToken: ${{ steps.cml_auth.outputs.response }}
+          bearerToken: ${{ steps.cml_token.outputs.token }}
           customHeaders: '{"Content-Type": "application/json"}'
           data: ${{ steps.r3_payload.outputs.json }}
       - name: Stop existing CML lab
@@ -139,19 +139,19 @@ jobs:
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/stop'
           method: 'PUT'
-          bearerToken: ${{ steps.cml_auth.outputs.response }}
+          bearerToken: ${{ steps.cml_token.outputs.token }}
           preventFailureOnNoResponse: 'true'
       - name: Wipe existing CML lab
         uses: fjogeleit/http-request-action@v1.16.5
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/wipe'
           method: 'PUT'
-          bearerToken: ${{ steps.cml_auth.outputs.response }}
+          bearerToken: ${{ steps.cml_token.outputs.token }}
           preventFailureOnNoResponse: 'true'
       - name: Start existing CML lab
         uses: fjogeleit/http-request-action@v1.16.5
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/start'
           method: 'PUT'
-          bearerToken: ${{ steps.cml_auth.outputs.response }}
+          bearerToken: ${{ steps.cml_token.outputs.token }}
           preventFailureOnNoResponse: 'true'
