@@ -57,14 +57,14 @@ jobs:
           url: '${{ env.CML_URL }}/api/v0/authenticate'
           method: 'POST'
           customHeaders: '{"Content-Type": "application/json"}'
-          data: '{"username":"admin","password":"1234QWer"}'
+          data: '{"username":"${{ env.CML_USERNAME }}","password":"${{ env.CML_PASSWORD }}"}'
       - name: Get node inventory from the existing lab
         id: node_inventory
         uses: fjogeleit/http-request-action@v1.16.5
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/nodes?data=true&exclude_configurations=true'
           method: 'GET'
-          bearerToken: ${{ fromJson(steps.cml_auth.outputs.response).token }}
+          bearerToken: ${{ steps.cml_auth.outputs.response }}
           responseFile: 'nodes.json'
       - name: Map router labels to node IDs
         id: node_map
@@ -89,7 +89,7 @@ jobs:
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/nodes/${{ steps.node_map.outputs.r1_node_id }}'
           method: 'PATCH'
-          bearerToken: ${{ fromJson(steps.cml_auth.outputs.response).token }}
+          bearerToken: ${{ steps.cml_auth.outputs.response }}
           customHeaders: '{"Content-Type": "application/json"}'
           data: ${{ steps.r1_payload.outputs.json }}
       - name: Build R2 configuration payload
@@ -106,7 +106,7 @@ jobs:
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/nodes/${{ steps.node_map.outputs.r2_node_id }}'
           method: 'PATCH'
-          bearerToken: ${{ fromJson(steps.cml_auth.outputs.response).token }}
+          bearerToken: ${{ steps.cml_auth.outputs.response }}
           customHeaders: '{"Content-Type": "application/json"}'
           data: ${{ steps.r2_payload.outputs.json }}
       - name: Build R3 configuration payload
@@ -123,7 +123,7 @@ jobs:
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/nodes/${{ steps.node_map.outputs.r3_node_id }}'
           method: 'PATCH'
-          bearerToken: ${{ fromJson(steps.cml_auth.outputs.response).token }}
+          bearerToken: ${{ steps.cml_auth.outputs.response }}
           customHeaders: '{"Content-Type": "application/json"}'
           data: ${{ steps.r3_payload.outputs.json }}
       - name: Stop existing CML lab
@@ -131,19 +131,19 @@ jobs:
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/stop'
           method: 'PUT'
-          bearerToken: ${{ fromJson(steps.cml_auth.outputs.response).token }}
+          bearerToken: ${{ steps.cml_auth.outputs.response }}
           preventFailureOnNoResponse: 'true'
       - name: Wipe existing CML lab
         uses: fjogeleit/http-request-action@v1.16.5
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/wipe'
           method: 'PUT'
-          bearerToken: ${{ fromJson(steps.cml_auth.outputs.response).token }}
+          bearerToken: ${{ steps.cml_auth.outputs.response }}
           preventFailureOnNoResponse: 'true'
       - name: Start existing CML lab
         uses: fjogeleit/http-request-action@v1.16.5
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/start'
           method: 'PUT'
-          bearerToken: ${{ fromJson(steps.cml_auth.outputs.response).token }}
+          bearerToken: ${{ steps.cml_auth.outputs.response }}
           preventFailureOnNoResponse: 'true'
