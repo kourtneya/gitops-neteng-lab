@@ -56,19 +56,20 @@ jobs:
         with:
           url: '${{ env.CML_URL }}/api/v0/authenticate'
           method: 'POST'
-          customHeaders: '{"Content-Type": "application/json"}'
           data: '{"username":"${{ env.CML_USERNAME }}","password":"${{ env.CML_PASSWORD }}"}'
+          responseFile: 'test.txt'
       - name: AUTH RESPONSE
         run: |
           echo "The full response string is: ${{ steps.cml_auth.outputs.response }}"
           echo "The status is: ${{ steps.cml_auth.outputs.status}}"
+          less 'test.txt'
       - name: Get node inventory from the existing lab
         id: node_inventory
         uses: fjogeleit/http-request-action@v1.16.5
         with:
           url: '${{ env.CML_URL }}/api/v0/labs/${{ env.CML_LAB_ID }}/nodes?data=true&exclude_configurations=true'
           method: 'GET'
-          bearerToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjb20uY2lzY28udmlybCIsInN1YiI6IjAwMDAwMDAwLTAwMDAtNDAwMC1hMDAwLTAwMDAwMDAwMDAwMCIsImV4cCI6MTc3ODYzODA5NywiaWF0IjoxNzc4NTUxNjk3LCJqdGkiOiJmYTgzZDYzMC1mNWU4LTRlMjUtYmZiYS1hMmYzN2MwOWYzZjMifQ.rZM6VsjziH72rBrlDLnT43573JnKgGM4rHC1JI_BzLE'
+          bearerToken: '${{ steps.cml_auth.outputs.response }}'
           responseFile: 'nodes.json'
       - name: Map router labels to node IDs
         id: node_map
